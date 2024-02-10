@@ -7,7 +7,6 @@ import mediapipe as mp
 from mediapipe.python.solutions.drawing_utils import _normalized_to_pixel_coordinates as denormalize_coordinates
 from sympy import plot
 
-
 def get_mediapipe_app(
     max_num_faces=1,
     refine_landmarks=True,
@@ -24,8 +23,11 @@ def get_mediapipe_app(
 
     return face_mesh
     # Define the indices for mouth landmarks
-chosen_mouth_upper_idxs = [61, 62, 63, 64, 65, 66, 67]  # Upper lip
-chosen_mouth_lower_idxs = [291, 308, 324, 318, 402, 317, 14]  # Lower lip
+# chosen_mouth_upper_idxs = [61, 62, 63, 64, 65, 66, 67]  # Upper lip
+# chosen_mouth_lower_idxs = [291, 308, 324, 318, 402, 317, 14]  # Lower lip
+
+chosen_mouth_upper_idxs = [61,  81, 82,  87, 88, 95,   13, 14,  61,  ]
+chosen_mouth_lower_idxs = [ 415, 80,402,308, 310, 312,  317, 318, 324]
 
 def distance(point_1, point_2):
     """Calculate l2-norm between two points"""
@@ -177,8 +179,11 @@ class VideoFrameHandler:
             
         }
         self.mouth_idx={
-            "upper": [61, 62, 63, 64, 65, 66, 67],
-            "lower": [291, 308, 324, 318, 402, 317, 14]
+            # "upper": [61, 62, 63, 64, 65, 66, 67],
+            # "lower": [291, 308, 324, 318, 402, 317, 14]
+            
+            "upper" : [61,  81, 82,  87, 88, 95,   13, 14,    ],
+            "lower" : [ 415, 80,402,308, 310, 312,  317, 318, 324]
         }
         
 
@@ -218,12 +223,16 @@ class VideoFrameHandler:
             landmarks = results.multi_face_landmarks[0].landmark
             # Calculate EAR and MAR
             EAR, ear_coordinates = calculate_avg_ear(landmarks, self.eye_idxs["left"], self.eye_idxs["right"], frame_w, frame_h)
+            print("This is ear coordinates: "+str(ear_coordinates))
+            print("This is EAR: "+str(EAR))
+            
             MAR, mar_coordinates = get_mar(landmarks, self.mouth_idx["upper"], self.mouth_idx["lower"], frame_w, frame_h)
-
+            print("This is mar coordinates: "+str(mar_coordinates))
+            print("This is MAR: "+str(MAR))
+            
             # Plot EAR and MAR landmarks
-            frame = plot_eye_landmarks(frame, ear_coordinates[0], ear_coordinates[1], self.state_tracker["COLOR"])
-            # frames = plot_lip_landmarks(frames, mar_coordinates[0], mar_coordinates[1], self.state_tracker["COLOR"])
-            # print("This is frames: "+frames)
+            frame = plot_eye_landmarks(frame, ear_coordinates[0]+mar_coordinates[0], ear_coordinates[1]+mar_coordinates[1], self.state_tracker["COLOR"])
+ 
 
             if EAR < thresholds["EAR_THRESH"] or MAR > thresholds["MAR_THRESH"]:
                 

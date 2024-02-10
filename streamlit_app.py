@@ -5,7 +5,7 @@ import streamlit as st
 from streamlit_webrtc import VideoHTMLAttributes, webrtc_streamer
 
 from audio_handling import AudioFrameHandler
-from drowsy_detection import VideoFrameHandler
+from drowsy_and_yawn_detection import VideoFrameHandler
 
 
 # Define the audio file to use.
